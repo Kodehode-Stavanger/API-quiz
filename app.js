@@ -3,7 +3,7 @@ async function getQuizData() {
     const result = await fetch("https://opentdb.com/api.php?amount=10");
     const data = await result.json();
 
-    // Decode HTML entities in the JSON data
+    // annoying html decoder
     for (let i = 0; i < data.results.length; i++) {
       data.results[i].question = decodeHtml(data.results[i].question);
       data.results[i].correct_answer = decodeHtml(
@@ -30,7 +30,7 @@ const quizContainer = document.querySelector("#quiz-container");
 getQuizData();
 
 function generateQuiz(data) {
-  const form = document.createElement("form"); // Create form element
+  const form = document.createElement("form");
   data.results.forEach((e, index) => {
     const questionElem = document.createElement("div");
     questionElem.classList.add("question");
@@ -42,38 +42,36 @@ function generateQuiz(data) {
       e.correct_answer,
     ]);
 
-    // Generate options
-    const optionsForm = document.createElement("div"); // Wrap options in a div
+    // generate options
+    const optionsForm = document.createElement("div");
     optionArray.forEach((e) => {
       const optionElem = document.createElement("input");
       optionElem.type = "radio";
       optionElem.value = e;
-      optionElem.name = "option" + index; // Unique name for each question
-      optionElem.required = true; // Make option required
+      optionElem.name = "option" + index;
+      optionElem.required = true;
       const labelElem = document.createElement("label");
       labelElem.textContent = e;
       optionsForm.append(optionElem, labelElem);
     });
-    // Appending
+    // appending
     questionElem.append(questionTxt, optionsForm);
     form.append(questionElem);
   });
 
-  // Create and append the submit button
   const submitBtn = document.createElement("button");
   submitBtn.textContent = "Submit";
   form.append(submitBtn);
   quizContainer.append(form);
 
-  // Add form submission event listener
   form.addEventListener("submit", (event) => {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault();
     handleSubmit(data);
   });
 }
 
 function handleSubmit(data) {
-  // Gather user's selected answers
+  // compile answers
   const selectedAnswers = [];
   const optionElements = document.querySelectorAll(
     "input[type='radio']:checked"
@@ -82,7 +80,7 @@ function handleSubmit(data) {
     selectedAnswers.push(element.value);
   });
 
-  // Compare selected answers with correct answers to calculate score
+  // compare&score
   let score = 0;
   data.results.forEach((question, index) => {
     const questionElem = document.querySelector(`#question-${index}`);
@@ -94,7 +92,7 @@ function handleSubmit(data) {
     }
   });
 
-  // Display score to the user
+  // scoredisplay
   const scoreModal = document.createElement("dialog");
   scoreModal.classList.add("dialog-overlay");
   const modalContent = document.createElement("div");
